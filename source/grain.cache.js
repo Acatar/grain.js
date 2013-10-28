@@ -20,16 +20,16 @@
 (function ($, window, grain, gdate, cookies) {
     (function (factory) {                                               // The factory: support module loading scenarios, such as require.js
         if (typeof define === 'function' && define.amd) {               // If a module loader, such as require.js, is present
-            return define('grain.cache', ['jquery', 'grain', 'grain.date', 'cookies'], factory); // Define and return the anonymous AMD module
+            return define('grain.cache', ['jquery', 'grain', 'cookies', 'grain.date'], factory); // Define and return the anonymous AMD module
         } 
         else {                                                          // Otherwise, if a module loader is NOT present
             if (typeof grain === 'undefined') {                         // If grain is undefined
                 window.grain = function () { return $.extend(true, {}, grain); }; // Create the namespace
             }
 
-            return factory($, grain, grain.cache, gdate, cookies);              // Add this module as a global variable, and return it
+            return factory($, grain, cookies, gdate, grain.cache);      // Add this module as a global variable, and return it
         }
-    })(function($, grain, $cache, gdate, cookies) {
+    })(function($, grain, cookies, gdate, $cache) {
         if(!JSON)
             throw new Error("This browser doesn't support JSON.  Please update your browser, or find a better browser, like Google Chrome.");
 
@@ -357,7 +357,7 @@
 
         //#endregion Cache
 
-        //#region Private
+        //#region Internal
         
         $internal.defaultWhenValNotFound = null;
         $internal.provider = null;
@@ -398,7 +398,7 @@
             catch(x) { return null; }
         }  
 
-        //#endregion Private
+        //#endregion Internal
 
         return $cache;      
     });

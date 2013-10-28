@@ -27,9 +27,9 @@
                 window.grain = function () { return $.extend(true, {}, grain); }; // Create the namespace
             }
 
-            return factory($, grain, grain.queryString);              // Add this module as a global variable, and return it
+            return factory($, grain, str, grain.queryString);              // Add this module as a global variable, and return it
         }
-    })(function($, grain, $qs) {
+    })(function($, grain, str, $qs) {
         $qs = $qs || grain.queryString || {};
         
         // Gets the url portion of the query string

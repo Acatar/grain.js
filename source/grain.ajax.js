@@ -27,9 +27,9 @@
                 window.grain = function () { return $.extend(true, {}, grain); }; // Create the namespace
             }
 
-            return factory($, grain, grain.ajax, reflection);           // Add this module as a global variable, and return it
+            return factory($, grain, reflection, grain.ajax);           // Add this module as a global variable, and return it
         }
-    })(function($, grain, $ajax, reflection) {
+    })(function($, grain, reflection, $ajax) {
         $ajax = $ajax || grain.ajax || {};
         var $internal = function() { return $.extend(true, {}, $internal); };
         
