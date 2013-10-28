@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>grain unit tests</title>
+        <!--<link href="@_favicon" media="all" rel="shortcut icon" type="image/x-icon" />-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+
+        <link href="http://ajax.aspnetcdn.com/ajax/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="qunit.css" rel="stylesheet" type="text/css" />  
+    </head>
+    <body>
+
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+        <script src="qunit.js"></script>
+        <script src="../source/dependencies/cookies.js" type="text/javascript"></script>
+        <!-- <script src="../source/grain.shims.require.js" type="text/javascript"></script> -->
+        <script src="../source/grain.js" type="text/javascript"></script>
+        <script src="../source/grain.string.js" type="text/javascript"></script>
+        <script src="../source/grain.array.js" type="text/javascript"></script>
+        <script src="../source/grain.date.js" type="text/javascript"></script>
+        <script src="../source/grain.reflection.js" type="text/javascript"></script>
+        <script src="../source/grain.wait.js" type="text/javascript"></script>
+        <script src="../source/grain.ajax.js" type="text/javascript"></script>
+        <script src="../source/grain.cache.js" type="text/javascript"></script>
+        <script src="../source/grain.formSubmitEvents.js" type="text/javascript"></script>
+        <script src="../source/grain.queryString.js" type="text/javascript"></script>
+        <script src="../source/grain.uri.js" type="text/javascript"></script>
+        <script src="../source/grain.shims.pascal.js" type="text/javascript"></script>
+
+        <script src="grain.string.tests.js" type="text/javascript"></script>
+        <script src="grain.array.tests.js" type="text/javascript"></script>
+        <script src="grain.date.tests.js" type="text/javascript"></script>
+        <script src="grain.reflection.tests.js" type="text/javascript"></script>
+        <script src="grain.wait.tests.js" type="text/javascript"></script>
+        <script src="grain.ajax.tests.js" type="text/javascript"></script>
+        <script src="grain.cache.tests.js" type="text/javascript"></script>
+        <script src="grain.formSubmitEvents.tests.js" type="text/javascript"></script>
+        <script src="grain.queryString.tests.js" type="text/javascript"></script>
+        <script src="grain.uri.tests.js" type="text/javascript"></script> 
+
+    </body>
+</html>
+
+<div id="qunit"></div>
+<div id="qunit-fixture">
+    <div id="contactform">
+    <form id="frm" action="/api/AccountApi/" class="ajax" data-ajax-options="TempOptions.PutOptions" method="POST" data-submit-btn="#userFormSubmit">
+                <input data-val="true" data-val-number="The field ID must be a number." data-val-required="The ID field is required." id="UserVw_Id" name="Id" type="hidden" value="15">
+
+                <label for="UserVw_Name">
+                    Name
+                </label>
+                <input id="UserVw_Name" name="Name" value="Andy Wright" type="text"/>
+                <br />
+
+                <label for="UserVw_Email">
+                    Email
+                </label>
+                <input id="UserVw_Email" name="Email" type="email" value="andy.wright@acatar.com"/>
+                <br />
+
+                <label for="UserVw_Nickname">
+                    NickName
+                </label>
+                <input id="UserVw_Nickname" name="Nickname" value="test nick name" type="text"/>
+                <br />
+
+                <label for="UserVw_LivesNear">
+                    City
+                </label>
+                <input id="UserVw_LivesNear" name="LivesNear" type="text"/>
+                <br />
+
+                <label for="UserVw_About">
+                   AboutMe
+                </label>
+                <textarea id="UserVw_AboutMe" name="AboutMe"></textarea>
+                <br />
+            <button id="userFormSubmit" class="btn btn-success" data-loading-msg="Saving..." data-completed-msg="Save">Save</button>   
+            <button id="Getbtn" data-ajax-options="TempOptions.GetOptions"/>
+        </form>
+    test
+  </div>        
+    
+    <div id="postContacForm">
+        <form id="postForm" class="ajax" novalidate="novalidate"
+                data-ajax-options="TempOptions.PostOptions" method="POST" data-submit-btn="#postBtn">
+
+            <input id="chessorwar" name ="ChessOrWar" value="War" type="text"/>
+            <button id="postBtn" class="btn btn-success" data-loading-msg="Saving..." data-completed-msg="Save">Save</button>   
+        </form>
+    </div>
+</div>
