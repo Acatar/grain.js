@@ -56,7 +56,7 @@
         // example: $.wait.until(function() { return true; }, function() { /* then */ window.console.info('it is true!'); }, function() { /* on gave up */ window.console.info('it was never true'); }, 0, 10);
         // example: $.wait.until(function() { return false; }, function() { /* then */ window.console.info('it is true!'); }, function() { /* on gave up */ window.console.info('it was never true'); }, 0, 10);
         $wait.until = function (isTrue, then, onGaveUp, timesTried, timesToTry, interval) {
-            var _interval = interval != null && !isNaN(interval) ? interval : _interval; 
+            var __interval = interval != null && !isNaN(interval) ? interval : _interval; 
 
             if (timesTried == null)
                 timesTried = 0; // the default timesTried is 0;
@@ -67,7 +67,7 @@
                 if (reflection.findOrGenerateFunction(isTrue).apply()) {
                     return reflection.findOrGenerateFunction(then).apply();
                 } else {
-                    $wait.until(isTrue, then, onGaveUp, timesTried + 1, timesToTry, _interval);
+                    $wait.until(isTrue, then, onGaveUp, timesTried + 1, timesToTry, __interval);
                 }
             }
             else if (timesTried < timesToTry) {
@@ -75,23 +75,13 @@
                     if (reflection.findOrGenerateFunction(isTrue).apply()) {
                         return reflection.findOrGenerateFunction(then).apply();
                     } else {
-                        $wait.until(isTrue, then, onGaveUp, timesTried + 1, timesToTry, _interval);
+                        $wait.until(isTrue, then, onGaveUp, timesTried + 1, timesToTry, __interval);
                     }
-                }, _interval);
+                }, __interval);
             }
             else {
                 return reflection.findOrGenerateFunction(onGaveUp).apply();
             }
-        }
-
-        // Retries indefinately until isTrue == true
-        $wait.keepTrying = function (isTrue, then, interval) {
-            var _interval = interval != null && !isNaN(interval) ? interval : _interval;
-
-            $wait.when(isTrue, function () {
-                reflection.findOrGenerateFunction(then).apply();
-                $wait.when(isTrue, arguments.callee, _interval);
-            }, _interval);
         }
 
         $.extend({

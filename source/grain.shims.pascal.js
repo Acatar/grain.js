@@ -71,7 +71,6 @@
         grain.Wait.Once = grain.wait.once;
         grain.Wait.When = grain.wait.when;
         grain.Wait.Until = grain.wait.until;
-        grain.Wait.KeepTrying = grain.wait.keepTrying;
         $.extend({
             Wait: grain.Wait
         });        
