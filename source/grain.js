@@ -108,7 +108,7 @@
             return this.attr('style', _existingStyle + style);
         };  
 
-        window.grain = $grain;
+        window.grain = $.grain = $grain;
         return $grain;      
     });
 })(window.jQuery, window);
