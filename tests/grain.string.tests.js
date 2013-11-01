@@ -80,5 +80,14 @@ $(function () {
         //This fails
         strictEqual($str.toTitleCase(), null, "should return nothing if no parameter is passed");
     });
-    
+
+    test('Base64 test', function () {
+        var _str = "test string";
+        var _strEncoded = "dGVzdCBzdHJpbmc=";
+        var _encoded = _str.Base64Encode();
+        var _decoded = _encoded.Base64Decode();
+        notEqual(_str, _encoded, "encoded string should not equal original string.");
+        strictEqual(_strEncoded, _encoded, "encoded string should be encoded.");
+        strictEqual(_str, _decoded, "should return same string as initial.");
+    });
 });
