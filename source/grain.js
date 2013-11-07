@@ -70,7 +70,7 @@
         $grain.wait = function() { return $.extend(true, {}, $grain.wait); };
 
         $grain.ajax = function() { return $.extend(true, {}, $grain.ajax); };
-        $grain.cache = function(options) { var _cache = $.extend(true, {}, $grain.cache, options); if($grain.cache.init) { $grain.cache.init(options); } return _cache; };
+        $grain.cache = function(options) { var _cache = $.extend(true, {}, $grain.cache, options); if(_cache.init) { _cache.init(options); } return _cache; };
         $grain.formSubmitEvents = function() { return $.extend(true, {}, $grain.formSubmitEvents); };
         $grain.queryString = function() { return $.extend(true, {}, $grain.queryString); };
         $grain.uri = function() { return $.extend(true, {}, $grain.url); };
