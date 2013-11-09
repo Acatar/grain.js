@@ -49,7 +49,7 @@
         }
 
         $date.getDateRangeAsISOStrings = function (date, duration, omitTime) {
-            var _dateRange = Grain.GetDateRange(date, duration);
+            var _dateRange = $date.GetDateRange(date, duration);
 
             var _startDateString = _dateRange.StartDate.toISOString();
             var _endDateString = _dateRange.EndDate.toISOString();
