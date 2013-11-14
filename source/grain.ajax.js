@@ -92,7 +92,7 @@
         // generates an ajax DELETE request
         // param - options: the JSON options object
         // returns the jqXHR object, which is a s$internalerset of the XMLHTTPRequest object. For more information, see http://api.jquery.com/jQuery.ajax/#jqXHR
-        $ajax.delete = function (options) {
+        $ajax.doDelete = $ajax["delete"] = function (options) {  // ajax.delete is invalid in older version of javascript
             options.method = options.method != undefined ? options.method : 'DELETE';
             return $ajax.post(options);
         }

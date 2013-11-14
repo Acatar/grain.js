@@ -81,7 +81,7 @@
         grain.Ajax.Get = grain.ajax.get;
         grain.Ajax.Post = grain.ajax.post;
         grain.Ajax.Put = grain.ajax.put;
-        grain.Ajax.Delete = grain.ajax.delete;
+        grain.Ajax.DoDelete = grain.Ajax["Delete"] = grain.ajax["delete"];
 
         grain.Cache = grain.cache;
         grain.Cache.SetProvider = grain.cache.setProvider;
