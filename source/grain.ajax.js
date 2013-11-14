@@ -64,7 +64,7 @@
         $ajax.get = function (optionsOrUrl) {
             if (typeof(optionsOrUrl) === "string") {
                 var _options = $internal.defaultOptions;
-                _options.Url = optionsOrUrl;
+                _options.url = optionsOrUrl;
                 return $internal.getRequest(_options);
             }
             return $internal.getRequest(optionsOrUrl);
@@ -77,7 +77,7 @@
             if (typeof (options) != 'object')
                 throw new Error("The options must be a JSON object.");
 
-            options.Method = options.Method != undefined ? options.Method : 'POST';
+            options.method = options.method != undefined ? options.method : 'POST';
             return $internal.getRequest(options);
         }
 
@@ -85,7 +85,7 @@
         // param - options: the JSON options object
         // returns the jqXHR object, which is a s$internalerset of the XMLHTTPRequest object. For more information, see http://api.jquery.com/jQuery.ajax/#jqXHR
         $ajax.put = function (options) {
-            options.Method = options.Method != undefined ? options.Method : 'PUT';
+            options.method = options.method != undefined ? options.method : 'PUT';
             return $ajax.post(options);
         }
 
@@ -93,7 +93,7 @@
         // param - options: the JSON options object
         // returns the jqXHR object, which is a s$internalerset of the XMLHTTPRequest object. For more information, see http://api.jquery.com/jQuery.ajax/#jqXHR
         $ajax.delete = function (options) {
-            options.Method = options.Method != undefined ? options.Method : 'DELETE';
+            options.method = options.method != undefined ? options.method : 'DELETE';
             return $ajax.post(options);
         }
 
@@ -114,7 +114,9 @@
                 jqXHRResult = null;
 
             var options = self.attr('data-ajax-options');
-            var _options = $internal.mergeOptions(reflection.findObject(options));
+            var _options = $internal.mergeOptions(reflection.findObject(options), self.attr('action'), self.attr('data-action'));
+
+            $internal.validateOptions(_options);          
 
             _btn.attr('disabled', 'disabled');
             event.preventDefault();
@@ -141,11 +143,10 @@
 
         // returns the jqXHR object, which is a s$internalerset of the XMLHTTPRequest object. For more information, see http://api.jquery.com/jQuery.ajax/#jqXHR
         $internal.getRequest = function (options) {
-            if (options.Url == null)
-                throw new Error("A url must be provided for an ajax request.");
-
             var jqXHRResult = null,
                 _options = $internal.mergeOptions(options);
+
+            $internal.validateOptions(_options);
 
             return $.ajax($internal.getjQueryAjaxOptions(_options))
                 .done(function (data, status, jqXHR) {
@@ -160,6 +161,13 @@
                 }); // complete
                 //.then(function(data, textStatus, jqXHR) {}, function(jqXHR, textStatus, errorThrown) {}
         } 
+
+        $internal.validateOptions = function(options) {
+            if (options.url == null)
+                throw new Error("A url must be provided for an ajax request.");  
+
+            // todo: do we need to require any other options?           
+        }
 
         $internal.beforeSend = function (jqXHR, options) {
             if (options.beforeSend)
@@ -236,9 +244,9 @@
             onComplete: null
         }  
 
-        $internal.mergeOptions = function (options) {
+        $internal.mergeOptions = function (options, formAction, html5Action) {
             return {
-                url:                options.url ||              options.Url ||              $internal.defaultOptions.url,
+                url:                options.url ||              options.Url || formAction || html5Action || $internal.defaultOptions.url,
                 returnType:         options.returnType ||       options.ReturnType || options.DataType || $internal.defaultOptions.returnType,
                 dataToSubmit:       options.dataToSubmit ||     options.DataToSubmit ||     $internal.defaultOptions.dataToSubmit,
                 submitDataType:     options.submitDataType ||   options.SubmitDataType ||   $internal.defaultOptions.submitDataType,
