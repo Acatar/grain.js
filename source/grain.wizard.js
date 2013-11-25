@@ -42,11 +42,16 @@
 
         var move = function (nextBool, className) {
             var currentNode = $('.' + className + ':visible');          // the object with the indicated class immediately after 
-            if (nextBool)                                               // the visible one with the indicated class
-                next = currentNode.next('.' + className);
-            else
+            if (nextBool) {
+                var validationFunction = $wiz.validationMethods[currentNode[0].id];
+                if ($.isFunction(validationFunction) && !validationFunction()) {
+                    return;
+                }
+                next = currentNode.next("." + className);
+            } else {
                 next = currentNode.prev('.' + className);
-            
+            }
+
             var prev = $('.' + className + ':visible');                 // the object that has the indicated class that is visible
             var uninitMethod = $wiz.unInitMethods[prev[0].id];          // get the uninit method by element id
             
@@ -76,6 +81,7 @@
         $wiz.doneMethods = [];
         $wiz.initMethods = [];
         $wiz.unInitMethods = [];        
+        $wiz.validationMethods = [];
 
         return $wiz;      
     });
