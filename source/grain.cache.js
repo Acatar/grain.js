@@ -20,22 +20,69 @@
 (function ($, window, grain, gdate, cookies) {
     (function (factory) {                                               // The factory: support module loading scenarios, such as require.js
         if (typeof define === 'function' && define.amd) {               // If a module loader, such as require.js, is present
-            return define('grain.cache', ['jquery', 'grain', 'cookies', 'grain.date'], factory); // Define and return the anonymous AMD module
+            return define('grain.cache', ['jquery', 'grain', 'grain.date', 'cookies'], factory); // Define and return the anonymous AMD module
         } 
         else {                                                          // Otherwise, if a module loader is NOT present
             if (typeof grain === 'undefined') {                         // If grain is undefined
                 window.grain = function () { return $.extend(true, {}, grain); }; // Create the namespace
             }
 
-            return factory($, grain, cookies, gdate, grain.cache);      // Add this module as a global variable, and return it
+            return factory($, grain, gdate, cookies);      // Add this module as a global variable, and return it
         }
-    })(function($, grain, cookies, gdate, $cache) {
+    })(function($, grain, gdate, cookies) {
         if(!JSON)
             throw new Error("This browser doesn't support JSON.  Please update your browser, or find a better browser, like Google Chrome.");
 
-        $cache = $cache || grain.cache || {};
-        var $providers = $cache.cacheProviders = grain.cacheProviders = function() { return $.extend(true, {}, $providers); };
-        var $internal = $cache._internal = function() { return $.extend(true, {}, $internal); };
+        //#region Internal
+        
+        var internalDef = function() {
+            var $self = {};
+
+            $self.defaultWhenValNotFound = null;
+            $self.provider = null;
+
+            // Gets the Cache Object from the Cache
+            // { Value: [NullableObject], Expiration: [NullableDate] }
+            $self.get = function(key) {
+                if ($self.provider.exists(key)) {
+                    var _cachedValue = $self.provider.get(key);
+
+                    if (_cachedValue.expiration != null && new Date(_cachedValue.expiration) <= new Date() /*now*/) {
+                        $self.provider.remove(key);
+                        return $self.defaultWhenValNotFound;
+                    }
+                    else {
+                        return _cachedValue;
+                    }
+                }
+                else return $self.defaultWhenValNotFound;
+            }
+
+            // Gets the value of a cached object from the Cache
+            $self.getValue = function(key) {
+                var _cachedValue = $self.get(key);
+                return _cachedValue ? _cachedValue.value : $self.defaultWhenValNotFound;
+            }
+
+            $self.makeValidExpirationTime = function(durationOrDateOfExpiration) {
+                try {
+                    if (typeof (durationOrDateOfExpiration) == 'number') {
+                        return new Date().addMinutes(durationOrDateOfExpiration);
+                    }
+                    else if (typeof (durationOrDateOfExpiration) == 'object') {
+                        return new Date(durationOrDateOfExpiration);
+                    }
+                    else return null;
+                }
+                catch(x) { return null; }
+            } 
+
+            return $self;             
+        }
+
+        //#endregion Internal
+
+        var $providers = function() { return $.extend(true, {}, $providers); };
 
         // Takes some inspiration from CacheJs, but is different enough, it is hardly a derivitive work
 
@@ -215,192 +262,157 @@
 
         //#region Cache
 
-        $cache.init = function (options) {
-            // set the $internal.provider
-            if (options != undefined) {
-                $cache.setProvider(options.cacheProvider || options.CacheProvider)
-            }
-            else {
-                $cache.setProvider()
-            }
-        }
+        var cacheDef = function (options, $internal) {
 
-        // Sets the storage object to use.
-        // On invalid store being passed, current store is not affected.
-        // @param new_store $internal.provider.
-        // @return boolean true if new_store implements the required methods and was set to this cache's $internal.provider. else false
-        $cache.setProvider = function (newProvider) {
-            //if (typeof(newProvider) === 'function') {
-            //    newProvider = newProvider();
-            //}
-            return setProvider(newProvider);
-        }
+            var $self = {};
 
-        // Helper for SetProvider - expectes newProvider to be of type, object
-        var setProvider = function (newProvider) {
-            if (typeof (newProvider) === 'object') {
-                if (newProvider.get && newProvider.set && newProvider.remove && newProvider.exists && newProvider.clear) {
-                    $internal.provider = newProvider;
-                    return $internal.provider;
-                } else {
+            // Sets the storage object to use.
+            // On invalid store being passed, current store is not affected.
+            // @param new_store $internal.provider.
+            // @return boolean true if new_store implements the required methods and was set to this cache's $internal.provider. else false
+            $self.setProvider = function (newProvider) {
+                //if (typeof(newProvider) === 'function') {
+                //    newProvider = newProvider();
+                //}
+                return setProvider(newProvider);
+            }
+
+            // Helper for SetProvider - expectes newProvider to be of type, object
+            var setProvider = function (newProvider) {
+                if (typeof (newProvider) === 'object') {
+                    if (newProvider.get && newProvider.set && newProvider.remove && newProvider.exists && newProvider.clear) {
+                        $internal.provider = newProvider;
+                        return $internal.provider;
+                    } else {
+                        $internal.provider = new $providers.localStorageRepository();
+                        return $internal.provider;
+                    }
+                }
+                else {
                     $internal.provider = new $providers.localStorageRepository();
                     return $internal.provider;
                 }
             }
-            else {
-                $internal.provider = new $providers.localStorageRepository();
+
+            // Gets the current storage provider
+            $self.getProvider = function () {
                 return $internal.provider;
             }
-        }
 
-        // Gets the current storage provider
-        $cache.getProvider = function () {
-            return $internal.provider;
-        }
+            // Returns true if cache contains the key, else false
+            // @param key string the key to search for
+            // @return boolean
+            $self.exists = function (key) {
+                return $internal.provider.exists(key);
+            };
 
-        // Returns true if cache contains the key, else false
-        // @param key string the key to search for
-        // @return boolean
-        $cache.exists = function (key) {
-            return $internal.provider.exists(key);
-        };
+            // Removes a key from the cache
+            // @param key string the key to remove for
+            // @return boolean
+            $self.remove = function (key) {
+                $internal.provider.remove(key);
+                return $internal.provider.exists(key);
+            };
 
-        // Removes a key from the cache
-        // @param key string the key to remove for
-        // @return boolean
-        $cache.remove = function (key) {
-            $internal.provider.remove(key);
-            return $internal.provider.exists(key);
-        };
+            // Removes any key, that belongs to a given group, from the cache
+            // @param groupName string the groupName to remove for
+            // @return int: the number of records removed. -1 indicates that the provider does not support this feature
+            $self.removeGroup = function (groupName) {
+                if ($internal.provider.removeGroup) {
+                    return $internal.provider.removeGroup(groupName);
+                }
+                return -1;
+            };
 
-        // Removes any key, that belongs to a given group, from the cache
-        // @param groupName string the groupName to remove for
-        // @return int: the number of records removed. -1 indicates that the provider does not support this feature
-        $cache.removeGroup = function (groupName) {
-            if ($internal.provider.removeGroup) {
-                return $internal.provider.removeGroup(groupName);
-            }
-            return -1;
-        };
-
-        // Clears the entire cache
-        $cache.clear = function () {
-            return $internal.provider.clear();
-        }
-
-        // Gets a value from the cache
-        // @param key string. The key to fetch
-        // @return mixed or NULL if no such key
-        $cache.get = function (key) {
-            return $internal.getValue(key);
-        };
-
-        /**
-        * Sets a value in the cache, returns true on sucess, false on failure.
-        * @param key string. the name of this cache object
-        * @param val mixed. the value to return when querying against this key value
-        * @param durationOrDateOfExpiration: minutes as an int or RFC1123 date, optional. If not set and is a new key, or set to false, this key never expires
-        *                       If not set and is pre-existing key, no change is made to expiry date
-        *                       If set to date, key expires on that date.
-        *                       If set to int, key expires n minutes from now
-        */
-        $cache.set = function (key, val, durationOrDateOfExpiration) {
-            var _expiration;
-
-            if ($internal.provider.exists(key)) {                           // key already exists, update it and set the expiration if durationOrDateOfExpiration is defined, 
-                                                                            // otherwise, keep the Expiration set to what it is already set to, in the cache.
-                _expiration = typeof (durationOrDateOfExpiration) != "undefined" ? 
-                    $internal.makeValidExpirationTime(durationOrDateOfExpiration) 
-                    : $internal.provider.get(key).expiration;
-            }
-            else {                                                          // key did not exist; create it
-                _expiration = $internal.makeValidExpirationTime(durationOrDateOfExpiration);
+            // Clears the entire cache
+            $self.clear = function () {
+                return $internal.provider.clear();
             }
 
-            $internal.provider.set(key, {                                        
-                "value": val,
-                "expiration": _expiration
-            });
+            // Gets a value from the cache
+            // @param key string. The key to fetch
+            // @return mixed or NULL if no such key
+            $self.get = function (key) {
+                return $internal.getValue(key);
+            };
 
-            return $internal.getValue(key);
-        };
+            /**
+            * Sets a value in the cache, returns true on sucess, false on failure.
+            * @param key string. the name of this cache object
+            * @param val mixed. the value to return when querying against this key value
+            * @param durationOrDateOfExpiration: minutes as an int or RFC1123 date, optional. If not set and is a new key, or set to false, this key never expires
+            *                       If not set and is pre-existing key, no change is made to expiry date
+            *                       If set to date, key expires on that date.
+            *                       If set to int, key expires n minutes from now
+            */
+            $self.set = function (key, val, durationOrDateOfExpiration) {
+                var _expiration;
 
-        // Gets the expiry date for given key
-        // @param key string. The key to get
-        // @return mixed, value for key or NULL if no such key
-        $cache.getExpiration = function (key) {
-            var _cachedValue = $internal.get(key);
+                if ($internal.provider.exists(key)) {                           // key already exists, update it and set the expiration if durationOrDateOfExpiration is defined, 
+                                                                                // otherwise, keep the Expiration set to what it is already set to, in the cache.
+                    _expiration = typeof (durationOrDateOfExpiration) != "undefined" ? 
+                        $internal.makeValidExpirationTime(durationOrDateOfExpiration) 
+                        : $internal.provider.get(key).expiration;
+                }
+                else {                                                          // key did not exist; create it
+                    _expiration = $internal.makeValidExpirationTime(durationOrDateOfExpiration);
+                }
 
-            if (!_cachedValue)
+                $internal.provider.set(key, {                                        
+                    "value": val,
+                    "expiration": _expiration
+                });
+
+                return $internal.getValue(key);
+            };
+
+            // Gets the expiry date for given key
+            // @param key string. The key to get
+            // @return mixed, value for key or NULL if no such key
+            $self.getExpiration = function (key) {
+                var _cachedValue = $internal.get(key);
+
+                if (!_cachedValue)
+                    return null;
+
+                if (_cachedValue && _cachedValue.expiration != null && _cachedValue.expiration != false)
+                    return new Date(_cachedValue.expiration);
+
+                return false;
+            };
+
+            // Sets the expiry date for given key
+            // @param key string. The key to set
+            // @param durationOrDateOfExpiration: minutes as an int or RFC1123 date, optional. If not set and is a new key, or set to false, this key never expires
+            //                       If not set and is pre-existing key, no change is made to expiry date
+            //                       If set to date, key expires on that date.
+            //                       If set to int, key expires n minutes from now
+            // @return mixed, value for key or NULL if no such key
+            $self.setExpiration = function (key, durationOrDateOfExpiration) {
+                if ($internal.provider.exists(key)) {
+                    return $self.set(key, $internal.getValue(key), durationOrDateOfExpiration);
+                }
+
                 return null;
+            };      
 
-            if (_cachedValue && _cachedValue.expiration != null && _cachedValue.expiration != false)
-                return new Date(_cachedValue.expiration);
-
-            return false;
-        };
-
-        // Sets the expiry date for given key
-        // @param key string. The key to set
-        // @param durationOrDateOfExpiration: minutes as an int or RFC1123 date, optional. If not set and is a new key, or set to false, this key never expires
-        //                       If not set and is pre-existing key, no change is made to expiry date
-        //                       If set to date, key expires on that date.
-        //                       If set to int, key expires n minutes from now
-        // @return mixed, value for key or NULL if no such key
-        $cache.setExpiration = function (key, durationOrDateOfExpiration) {
-            if ($internal.provider.exists(key)) {
-                return $cache.set(key, $internal.getValue(key), durationOrDateOfExpiration);
+            // set the $internal.provider
+            if (options != undefined) {
+                $self.setProvider(options.cacheProvider || options.CacheProvider)
+            }
+            else {
+                $self.setProvider()
             }
 
-            return null;
-        };      
+            return $self;
+        }
 
         //#endregion Cache
 
-        //#region Internal
-        
-        $internal.defaultWhenValNotFound = null;
-        $internal.provider = null;
 
-        // Gets the Cache Object from the Cache
-        // { Value: [NullableObject], Expiration: [NullableDate] }
-        $internal.get = function(key) {
-            if ($internal.provider.exists(key)) {
-                var _cachedValue = $internal.provider.get(key);
-
-                if (_cachedValue.expiration != null && new Date(_cachedValue.expiration) <= new Date() /*now*/) {
-                    $internal.provider.remove(key);
-                    return $internal.defaultWhenValNotFound;
-                }
-                else {
-                    return _cachedValue;
-                }
-            }
-            else return $internal.defaultWhenValNotFound;
-        }
-
-        // Gets the value of a cached object from the Cache
-        $internal.getValue = function(key) {
-            var _cachedValue = $internal.get(key);
-            return _cachedValue ? _cachedValue.value : $internal.defaultWhenValNotFound;
-        }
-
-        $internal.makeValidExpirationTime = function(durationOrDateOfExpiration) {
-            try {
-                if (typeof (durationOrDateOfExpiration) == 'number') {
-                    return new Date().addMinutes(durationOrDateOfExpiration);
-                }
-                else if (typeof (durationOrDateOfExpiration) == 'object') {
-                    return new Date(durationOrDateOfExpiration);
-                }
-                else return null;
-            }
-            catch(x) { return null; }
-        }  
-
-        //#endregion Internal
-
-        return $cache;      
+        var $this = grain.cache = function(options) { return cacheDef(options, internalDef()); };
+        $this.cacheProviders = grain.cacheProviders = $providers();
+        return $this;      
     });
 })( window.jQuery, 
     window, 

@@ -84,22 +84,22 @@
         grain.Ajax.DoDelete = grain.Ajax["Delete"] = grain.ajax["delete"];
 
         grain.Cache = grain.cache;
-        grain.Cache.SetProvider = grain.cache.setProvider;
-        grain.Cache.GetProvider = grain.cache.getProvider;
-        grain.Cache.Exists = grain.cache.exists;
-        grain.Cache.Remove = grain.cache.remove;
-        grain.Cache.RemoveGroup = grain.cache.removeGroup;
-        grain.Cache.Clear = grain.cache.clear;
-        grain.Cache.Get = grain.cache.get;
-        grain.Cache.Set = grain.cache.set;
-        grain.Cache.GetExpiration = grain.cache.getExpiration;
-        grain.Cache.SetExpiration = grain.cache.setExpiration;
+        //grain.Cache.SetProvider = grain.cache.setProvider;
+        //grain.Cache.GetProvider = grain.cache.getProvider;
+        //grain.Cache.Exists = grain.cache.exists;
+        //grain.Cache.Remove = grain.cache.remove;
+        //grain.Cache.RemoveGroup = grain.cache.removeGroup;
+        //grain.Cache.Clear = grain.cache.clear;
+        //grain.Cache.Get = grain.cache.get;
+        //grain.Cache.Set = grain.cache.set;
+        //grain.Cache.GetExpiration = grain.cache.getExpiration;
+        //grain.Cache.SetExpiration = grain.cache.setExpiration;
 
-        grain.Cache.CacheProviders = grain.cache.cacheProviders;
-        grain.CacheProviders = grain.Cache.CacheProviders;
-        grain.Cache.CacheProviders.PageRepository = grain.cache.cacheProviders.pageRepository;
-        grain.Cache.CacheProviders.LocalStorageRepository = grain.cache.cacheProviders.localStorageRepository;
-        grain.Cache.CacheProviders.CookieRepository = grain.cache.cacheProviders.cookieRepository;     
+        //grain.Cache.CacheProviders = grain.cacheProviders;
+        grain.CacheProviders = grain.cacheProviders;
+        grain.CacheProviders.PageRepository = grain.cacheProviders.pageRepository;
+        grain.CacheProviders.LocalStorageRepository = grain.cacheProviders.localStorageRepository;
+        grain.CacheProviders.CookieRepository = grain.cacheProviders.cookieRepository;     
 
         grain.FormSubmitEvents = grain.formSubmitEvents;
         grain.FormSubmitEvents.AddSubmitEvents = grain.formSubmitEvents.addSubmitEvents;

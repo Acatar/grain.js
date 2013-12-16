@@ -22,7 +22,7 @@ $(function () {
         $wait.once(function () {
             _elapsed = new Date().getTime() - _startTime;
             _num++;
-            ok(_elapsed >= 40 && _elapsed < 200, "should wait ~40 ms to execute the function");
+            ok(_elapsed >= 40 && _elapsed < 200, "should wait ~40 ms to execute the function (actual = " + _elapsed + ")");
             ok(_num == 1, "should wait only once");
             start();
         });
@@ -40,7 +40,7 @@ $(function () {
         $wait.once(function () {
             _elapsed = new Date().getTime() - _startTime;
             _num++;
-            ok(_elapsed >= 250 && _elapsed < 400, "should wait ~250 ms to execute the function");
+            ok(_elapsed >= 245 && _elapsed < 400, "should wait ~250 ms to execute the function (actual = " + _elapsed + ")");
             ok(_num == 1, "should wait only once");
             start();
         }, 250);
@@ -66,7 +66,7 @@ $(function () {
             for (var i = 0; i < 2; i++) {
                 var _result = _results[i];
                 var _elapsedTimeIsOk = _result.actualElapsedTime >= _result.expectedElapsedTime && _result.actualElapsedTime < _result.marginOfError;
-                ok(_elapsedTimeIsOk, "should wait ~40 ms intervals  betwen executions");
+                ok(_elapsedTimeIsOk, "should wait ~40 ms intervals  betwen executions(actual = " + _result.actualElapsedTime + ")");
             }
             start();
         }, function () { });
@@ -148,7 +148,7 @@ $(function () {
 
         $wait.until(function () { return _results.length == 10 }, function () {
             //console.info(_results);
-            for (var i = 0; i < 10; i++) {
+            for (var i in _results) {
                 var _result = _results[i];
                 var _elapsedTimeIsOk = _result.actualElapsedTime >= _result.expectedElapsedTime && _result.actualElapsedTime < _result.upperMarginOfError;
 
@@ -157,7 +157,7 @@ $(function () {
                     console.info(_result.actualElapsedTime + ' should be < ' + _result.upperMarginOfError);
                 }
 
-                ok(_elapsedTimeIsOk, "should wait ~10 ms intervals  betwen executions");
+                ok(_elapsedTimeIsOk, "should wait ~10 ms intervals  betwen executions (actual = " + _result.actualElapsedTime + ")");
             }
             start();
         }, function () { });
