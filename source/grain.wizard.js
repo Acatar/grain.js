@@ -36,8 +36,19 @@
             $('.' + className + ':not(:first)').hide();                 // hide all the elements with the indicated class name except the first one.
             $('.' + className + ':first').show();                       // show the first one (in case it starts off hidden)
 
-            $('.' + className + ' button[data-button="nextButton"]').click(function () { $wiz.next(className); });
-            $('.' + className + ' button[data-button="prevButton"]').click(function () { $wiz.previous(className); });
+            $("." + className).click(function (ev) {
+                var result = $(ev.target).attr('data-button');
+                if (result) {
+                    if (result === 'nextButton') {
+                        $wiz.next(className);
+                        ev.bubbles = false;
+                    }
+                    else if (result === 'previousButton') {
+                        $wiz.previous(className);
+                        ev.bubbles = false;
+                    }
+                }
+            });
         };
 
         var move = function (nextBool, className) {
