@@ -34,7 +34,11 @@
         
         $wiz.init = function (className) {
             $('.' + className + ':not(:first)').hide();                 // hide all the elements with the indicated class name except the first one.
-            $('.' + className + ':first').show();                       // show the first one (in case it starts off hidden)
+            var firstStep = $("." + className + ":first");
+            firstStep.show();
+
+            //if the first step has an init method, run it
+            $wiz.runMethods($wiz.initMethods[firstStep[0].id], firstStep);
 
             $("." + className).click(function (ev) {
                 var result = $(ev.target).attr('data-button');
@@ -42,10 +46,12 @@
                     if (result === 'nextButton') {
                         $wiz.next(className);
                         ev.bubbles = false;
+                        ev.stopPropagation();
                     }
                     else if (result === 'previousButton') {
                         $wiz.previous(className);
                         ev.bubbles = false;
+                        ev.stopPropagation();
                     }
                 }
             });
@@ -64,26 +70,25 @@
             }
 
             var prev = $('.' + className + ':visible');                 // the object that has the indicated class that is visible
-            var uninitMethod = $wiz.unInitMethods[prev[0].id];          // get the uninit method by element id
-            
-            if (uninitMethod)                                           // if it's been set, run it and pass the node in to it
-                uninitMethod(prev);
-            
+            $wiz.runMethods($wiz.unInitMethods[prev[0].id], prev);      // get the uninit method by element id
             prev.hide();                                                // hide the previously visible node
                                                                         // note: this hides the last node even if there isn't a next one
             
             if (next.length == 0) {                                     // if there are no more steps
-                var doneMethod = $wiz.doneMethods[className];           // get the done method by class name
-                
-                if (doneMethod)                                         // if it's been set, run it
-                    doneMethod();
+                $wiz.runMethods($wiz.doneMethods[className]);           // get the done method by class name
             }
             else {
-                var initMethod = $wiz.initMethods[next[0].id];          // get the init method by the id of the next element
-                if (initMethod)                                         // if it's been set, run it
-                    initMethod(next);
-                
+                $wiz.runMethods($wiz.initMethods[next[0].id], next);    // get the init method by the id of the next element
                 next.show();                                            // show the next step in the wizard
+            }
+        };
+
+        $wiz.runMethods = function (method, args) {
+            var methodArray = [].concat(method);
+            for (var index = 0; index < methodArray.length; index++) {
+                if ($.isFunction(methodArray[index])) {
+                    methodArray[index](args);
+                }
             }
         };
 
