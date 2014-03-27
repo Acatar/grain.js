@@ -232,6 +232,8 @@
                 }
             },
             onError: function (jqXHR, status, errorThrown) {
+                if ($.ajaxSettings && $.ajaxSettings.statusCode && $.isFunction($.ajaxSettings.statusCode[jqXHR.status])) return;
+
                 var data = $.parseJSON(jqXHR.responseText);
 
                 if($.pnotify) {
