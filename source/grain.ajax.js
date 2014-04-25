@@ -263,7 +263,8 @@
                 beforeSend:         options.beforeSend ||       options.BeforeSend ||       $internal.defaultOptions.beforeSend,
                 onSuccess:          options.onSuccess ||        options.OnSuccess ||        $internal.defaultOptions.onSuccess,
                 onError:            options.onError ||          options.OnError ||          $internal.defaultOptions.onError,
-                onComplete:         options.onComplete ||       options.OnComplete ||       $internal.defaultOptions.onComplete                
+                onComplete:         options.onComplete ||       options.OnComplete ||       $internal.defaultOptions.onComplete,
+                headers:            options.headers ||          options.Headers ||          $internal.defaultOptions.headers
             };
         }
 
@@ -277,7 +278,8 @@
                 beforeSend: function (jqXHR) {
                     $internal.beforeSend(jqXHR, options);
                 },
-                cache: options.cache
+                cache: options.cache,
+                headers: options.headers
             }
         }
 
