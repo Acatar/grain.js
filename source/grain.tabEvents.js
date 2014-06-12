@@ -1,5 +1,7 @@
 // inspired by: http://stackoverflow.com/questions/1060008/is-there-a-way-to-detect-if-a-browser-window-is-not-currently-active
 grain.tabEvents = { init: function(window, document) {
+    "use strict";
+
     var hidden = "hidden",
         handlers = [],
         onchange,
@@ -25,7 +27,7 @@ grain.tabEvents = { init: function(window, document) {
 
     addHandler = function(callback) {
         if(typeof(callback) !== 'function')
-            throw Error('tab event handlers must be functions that accept a single argument.');
+            throw Error('Tab event handlers must be functions that accept a single argument.');
 
         handlers.push(callback);
     };
@@ -47,6 +49,6 @@ grain.tabEvents = { init: function(window, document) {
         window.onpageshow = window.onpagehide = window.onfocus = window.onblur = onchange; 
 
     return {
-        addHandler: addHandler
+        registerHandler: addHandler
     };   
 }};
